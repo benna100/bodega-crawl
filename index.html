@@ -13,93 +13,381 @@
 
     <style>
       :root {
-        --accent: #b22222;
+        --primary: #d4343a;
+        --primary-dark: #b8252a;
+        --primary-light: #e66b70;
+        --secondary: #f4a261;
+        --accent: #2a9d8f;
+        --background: #f8f9fa;
+        --surface: #ffffff;
+        --surface-variant: #f1f3f4;
+        --text-primary: #1a1a1a;
+        --text-secondary: #5f6368;
+        --text-tertiary: #9aa0a6;
+        --border: #e8eaed;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+        --gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
       html,
       body {
         margin: 0;
-        font-family: system-ui, sans-serif;
-        background: #faf7f2;
-        color: #222;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: var(--background);
+        color: var(--text-primary);
+        line-height: 1.6;
       }
+
+      .header {
+        background: var(--gradient);
+        color: white;
+        padding: 2rem 1rem;
+        text-align: center;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="30" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="70" r="2" fill="rgba(255,255,255,0.1)"/></svg>');
+        background-size: 100px 100px;
+        opacity: 0.3;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .subtitle {
+        margin: 0.5rem 0 0 0;
+        font-size: 1.1rem;
+        opacity: 0.9;
+        font-weight: 400;
+        position: relative;
+        z-index: 1;
+      }
+
       h2 {
-        margin: 0.5em 0;
-        color: var(--accent);
+        margin: 0 0 1.5rem 0;
+        color: var(--primary);
+        font-size: 1.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
+
+      h2::before {
+        content: '';
+        width: 4px;
+        height: 2rem;
+        background: var(--gradient);
+        border-radius: 2px;
+      }
+
       #map {
         width: 100%;
-        height: 50vh;
+        height: 60vh;
+        min-height: 400px;
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        margin: 2rem 0;
+        overflow: hidden;
       }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
       section {
-        padding: 1rem;
-        max-width: 800px;
-        margin: auto;
+        padding: 2rem 1rem;
+        margin-bottom: 1rem;
       }
+
+      .section-card {
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 2rem;
+      }
+
+      .section-content {
+        padding: 2rem;
+      }
+
       details {
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 0.5rem 0.75rem;
-        background: #fff;
-        transition: background 0.2s;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0;
+        background: var(--surface);
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
-      details + details {
-        margin-top: 0.5rem;
+
+      details:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
       }
+
       details[open] {
-        background: #f5f5f5;
+        background: var(--surface-variant);
+        box-shadow: var(--shadow);
       }
+
       summary {
         list-style: none;
         cursor: pointer;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 1rem;
         font-weight: 600;
+        padding: 1.5rem;
+        background: var(--surface);
+        border-radius: 12px;
+        transition: all 0.2s ease;
+        position: relative;
       }
+
       summary::-webkit-details-marker {
         display: none;
       }
-      summary::before {
-        content: "➤";
-        transition: transform 0.2s;
+
+      summary::after {
+        content: "▼";
+        font-size: 0.8em;
+        color: var(--text-secondary);
+        transition: transform 0.2s ease;
+        margin-left: auto;
       }
-      details[open] summary::before {
-        transform: rotate(90deg);
+
+      details[open] summary::after {
+        transform: rotate(180deg);
       }
+
       details.checked summary {
         text-decoration: line-through;
         opacity: 0.6;
+        background: var(--surface-variant);
       }
+
+      .place-content {
+        padding: 0 1.5rem 1.5rem 1.5rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+
+      .place-address {
+        font-size: 0.9rem;
+        color: var(--text-tertiary);
+        font-style: italic;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+      }
+
       input[type="checkbox"] {
-        width: 1.1em;
-        height: 1.1em;
-        accent-color: var(--accent);
+        width: 1.2em;
+        height: 1.2em;
+        accent-color: var(--primary);
+        cursor: pointer;
+        transform: scale(1.1);
       }
+
+      /* Score Display */
+      #score-display {
+        background: var(--gradient);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.5em;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        overflow: hidden;
+      }
+
+      #score-display::before {
+        content: '🏆';
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        opacity: 0.3;
+      }
+
+      .score-text {
+        margin: 0;
+        font-size: 1rem;
+        opacity: 0.9;
+        font-weight: 400;
+      }
+
+      .score-number {
+        font-size: 2.5rem;
+        margin: 0.5rem 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Map Icons */
+      .custom-div-icon {
+        background: var(--gradient);
+        border-radius: 50%;
+        color: white;
+        font-weight: 700;
+        text-align: center;
+        line-height: 30px;
+        border: 3px solid white;
+        box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+      }
+
+      .custom-div-icon:hover {
+        transform: scale(1.1);
+      }
+
+      .custom-div-icon.visited {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        opacity: 0.7;
+      }
+
       /* Challenges */
       .challenge {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.4rem 0;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--surface);
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
+        border: 1px solid var(--border);
       }
+
+      .challenge:hover {
+        background: var(--surface-variant);
+        transform: translateX(4px);
+      }
+
       .challenge.checked {
         text-decoration: line-through;
         opacity: 0.6;
+        background: var(--surface-variant);
+      }
+
+      .challenge-text {
+        font-weight: 500;
+        flex: 1;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: var(--border);
+        border-radius: 4px;
+        overflow: hidden;
+        margin: 1rem 0;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: var(--gradient);
+        transition: width 0.3s ease;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .subtitle {
+          font-size: 1rem;
+        }
+
+        #map {
+          height: 50vh;
+          margin: 1rem 0;
+        }
+
+        .section-content {
+          padding: 1.5rem;
+        }
+
+        summary {
+          padding: 1rem;
+        }
+
+        .challenge {
+          padding: 0.8rem;
+        }
+
+        #score-display {
+          padding: 1.5rem;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="map"></div>
+    <header class="header">
+      <div class="container">
+        <h1>Benjamin, Oskar og Henriks bodega crawl</h1>
+        <p class="subtitle">En episk rejse gennem Københavns bedste bodegaer 🍺</p>
+      </div>
+    </header>
 
-    <section>
-      <h2>Bodegaer</h2>
-      <div id="place-list"></div>
-    </section>
+    <div class="container">
+      <div id="map"></div>
+    </div>
 
-    <section>
-      <h2>Challenges</h2>
-      <div id="challenge-list"></div>
-    </section>
+    <div class="container">
+      <div class="section-card">
+        <div class="section-content">
+          <h2>🏛️ Bodegaer</h2>
+          <div id="place-list"></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-content">
+          <h2>🎯 Challenges</h2>
+          <div id="score-display">
+            <p class="score-text">Din Score</p>
+            <div class="score-number">
+              <span id="score">0</span> / <span id="total-challenges">12</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+          </div>
+          <div id="challenge-list"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- Leaflet JS (integrity & crossorigin fjernet for at sikre indlæsning) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -113,7 +401,7 @@
             id: 1,
             name: "Galathea Kroen",
             address: "Rådhusstræde 9, 1466 København K",
-            desc: "Jazzkro med eksotiske souvenirs fra Galathea‑ekspeditionen.",
+            desc: "Galathea Kroen åbnede i sin tid med to sømænd fra den berømte Galathea-ekspedition bag roret. Stedet er fyldt med eksotiske souvenirs – fra masker og skind til en hel kano – som de hjembragte fra ekspeditionen. I dag strømmer tonerne af jazzmusik ud af højttalerne på vinyl, og jævnligt er der endda live-jazz på programmet. Galathea Kroen var i 1960'erne et af stoppene på Dirch Passers legendariske 'Dødsrute', hvor byens skuespillere og digtere væltede fra beværtning til beværtning – her kunne man være heldig at møde Dirch Passer selv i baren.",
             lat: 55.6766,
             lon: 12.574561,
           },
@@ -121,7 +409,7 @@
             id: 2,
             name: "Toga Vinstue",
             address: "Store Kirkestræde 3, 1073 København K",
-            desc: "Politisk mødested med klassisk stemning og stort udvalg af specialøl.",
+            desc: "Toga Vinstue har snart 100-årsjubilæum og er kendt som 'det politiske kandestøberi' – et folkeligt mødested for politiske diskussioner. Indretningen er klassisk og uprætentiøs, og både unge og gamle mødes her over en øl for at vende verdenssituationen. Stamgæsterne tæller ungdomspolitikere, journalister og garvede politikere, og ofte står en kendt politiker selv bag baren som gæstebartender. Om dagen serveres der traditionelle danske frokostretter, mens aftenen byder på et stort udvalg af specialøl – og efter kl. 16 må man endda tænde en cigaret, som i de gode gamle dage.",
             lat: 55.678769,
             lon: 12.580237,
           },
@@ -129,7 +417,7 @@
             id: 3,
             name: "Bo‑Bi Bar",
             address: "Klareboderne 14, 1115 København K",
-            desc: "Lille ikonisk bar fra 1917 med rødt interiør og flaskebajere.",
+            desc: `Bo-Bi Bars klassiske ovale skilt pryder facaden i Klareboderne. Bo-Bi Bar er en af byens mindste, men mest ikoniske bodegas. Ifølge sagnet kom en sømand i land i 1917, købte Københavns allerførste bardisk og grundlagde Bo-Bi Bar. Siden Første Verdenskrig har dette lille sted tiltrukket et bredt publikum – alt fra kunstnere og journalister til embedsmænd og 9-til-5-folk har lagt vejen forbi. Indretningen står næsten urørt med rødt tapet og røde lamper, som de så ud i begyndelsen af forrige århundrede. Øl drikkes direkte af flasken, og i det lille røgfyldte lokale kommer man nemt i snak med sidemanden i baren .`,
             lat: 55.680742,
             lon: 12.578066,
           },
@@ -137,7 +425,7 @@
             id: 4,
             name: "Rosengårdens Bodega",
             address: "Rosengården 11, 1174 København K",
-            desc: "Kælderbodega med dramatisk modstandshistorie og skudhuller i væggen.",
+            desc: "Rosengårdens Bodega ligner ved første øjekast en ganske almindelig brun kælderbodega, men væggene gemmer på dramatisk historie. Under Anden Verdenskrig – den 20. april 1944 – trængte medlemmer af modstandsgruppen BOPA ind og likviderede en dansk stikker med øgenavnet 'Hestetyven' netop her på bodegaen. Skuddene der faldt den dag efterlod skudhuller i væggen, som man den dag i dag kan få øje på, hvis man kigger godt efter. Historien om likvideringen af Rudolf 'Hestetyven' Christiansen giver stedet en helt særlig atmosfære og gør Rosengårdens Bodega til et levende stykke Københavner-historie.",
             lat: 55.6819,
             lon: 12.5735,
           },
@@ -145,7 +433,7 @@
             id: 5,
             name: "Palæ Bar",
             address: "Ny Adelgade 5, 1104 København K",
-            desc: "Jazzfyldt bar med kulturpris og nostalgiske skilte.",
+            desc: "Palæ Bars intime interiør er udsmykket med gamle emaljeskilte og jazz-memorabilia. Palæ Bar åbnede i 1984 i lokaler, der har huset værtshus siden 1930'erne, og stedet har udviklet sig til et samlingspunkt for byens kulturelle sjæle. Her kommer københavnere i alle aldre og af alle professioner, forenet af kærligheden til den hyggelige atmosfære – og til jazzmusikken. Væggene prydes af et væld af nostalgiske skilte og fotografier, og man fornemmer straks stedets sjæl og historie. Palæ Bar er kendt for sin levende jazzkultur: Hver tredje søndag året rundt er der live jazz, og under Copenhagen Jazz Festival uddeles Palæ Bars Jazzpris på 25.000 kr., som siden 1990 årligt er givet til en fremragende jazzmusiker. Blandt stamgæsterne finder man mange fra kultur- og medieverdenen, og baren har i årevis været et favoritsted for journalister, forfattere og musikere i indre by.",
             lat: 55.681,
             lon: 12.58,
           },
@@ -153,7 +441,7 @@
             id: 6,
             name: "Hviids Vinstue",
             address: "Kongens Nytorv 19, 1050 København K",
-            desc: "Byens ældste værtshus (1723) – berømt for sin krydrede gløgg.",
+            desc: `Den over 300 år gamle bar på Hviids Vinstue emmer af klassisk københavnsk krostemning. Hviids Vinstue har eksisteret uafbrudt siden 1723 og er dermed byens ældste værtshus på samme adresse. Stedet er en legende i København og byder på traditionelt smørrebrød og kolde øl i historiske rammer. Hviids er især kendt for sin krydrede gløgg, der serveres hvert år fra 11. november kl. 11 – en juletradition, som trofaste stamkunder valfarter til. Indretningen er klassisk med mørke træmøbler og gamle lædersofaer, og fra vinduet har man udsigt til Kongens Nytorv og Det Kongelige Teater 16. Gennem næsten tre århundreder har Hviids haft besøg af utallige prominente gæster – både H.C. Andersen og forfatteren Tove Ditlevsen kom her for at nyde en drink i de hyggelige stuer .`,
             lat: 55.67978,
             lon: 12.58472,
           },
@@ -161,7 +449,7 @@
             id: 7,
             name: "Skindbuksen",
             address: "Lille Kongensgade 4, 1074 København K",
-            desc: "Historisk værtshus siden 1728 med klassisk dansk menu.",
+            desc: `Skindbuksen hører til blandt byens allerældste beværtninger og har ligget i Lille Kongensgade siden 1728. Oprindeligt var den en skænkestue for det fine Grand Café og gik under navnet “Café nr. 4” efter adressen. Kuskene fra byens hestedroscher yndede at komme her og få en dram – de bar alle skindovertræksbukser som en del af uniformen, og i folkemunde begyndte man at kalde stedet “Skindbuksen”. Navnet bed sig fast og blev det officielt navn i 1930, og bodegaen har stort set heddet det lige siden. Udover den gode, gamle danske menu (bl.a. den berømte skipperlabskovs) har Skindbuksen også haft sine farverige stamgæster. Blandt andet kom digteren Jens August Schade jævnligt her i 1970’erne for at nyde stedets stemning og selskab. Med sin næsten 300-årige historie, klassiske atmosfære og stærke fortællinger er Skindbuksen et perfekt sidste stop på ruten – et sted hvor Københavns fortid stadig kan mærkes i væggene.`,
             lat: 55.6793,
             lon: 12.5828,
           },
@@ -172,6 +460,36 @@
           { id: "ch2", text: "Vær en god wingman for Oskar" },
           { id: "ch3", text: "Snak med en du ikke kender" },
           { id: "ch4", text: "Stjæl noget (småt & sjovt)" },
+          { id: "ch5", text: "Få bartenderen til at fortælle en vits" },
+          { id: "ch6", text: "Få taget en selfie med en fremmed" },
+          { id: "ch7", text: "Dans i mindst 10 sekunder uden musik" },
+          { id: "ch8", text: "Byt et stykke tøj med en" },
+          {
+            id: "ch9",
+            text: "Syng højt med på en sang, du ikke kender teksten til",
+          },
+          { id: "ch10", text: "Skål med en gruppe mennesker, du ikke kender" },
+          {
+            id: "ch11",
+            text: "Hold en 1-minuts tale om et komplet tilfældigt emne",
+          },
+          { id: "ch12", text: "Skriv et digt om bartenderen og læs det højt" },
+          {
+            id: "ch13",
+            text: 'Udfordr en fremmed til en "sten-saks-papir" dyst.',
+          },
+          {
+            id: "ch14",
+            text: "Start en fællessang blandt fremmede mennesker.",
+          },
+          {
+            id: "ch15",
+            text: "Bestil en drink der matcher farven på tøjet hos en fremmed.",
+          },
+          {
+            id: "ch16",
+            text: "Få nogen til at give dig en high-five uden at forklare hvorfor.",
+          },
         ];
 
         /* ---------- Guard: Leaflet indlæst? ---------- */
@@ -193,16 +511,55 @@
           maxZoom: 19,
         }).addTo(map);
 
+        const markers = {};
         places.forEach((p) => {
           if (p.lat && p.lon) {
-            const marker = L.marker([p.lat, p.lon]).addTo(map);
-            marker.bindPopup(`<strong>${p.name}</strong><br>${p.address}`);
+            const icon = L.divIcon({
+              className: "custom-div-icon",
+              html: `<span>${p.id}</span>`,
+              iconSize: [30, 30],
+              iconAnchor: [15, 15],
+            });
+            const marker = L.marker([p.lat, p.lon], { icon: icon }).addTo(map);
+            marker.bindPopup(
+              `<strong>${p.id}. ${p.name}</strong><br>${p.address}`
+            );
+            markers[p.id] = marker;
           }
         });
 
+        const routeLayerGroup = L.layerGroup().addTo(map);
+
+        const updateMapState = () => {
+          routeLayerGroup.clearLayers();
+          const coords = places.map((p) => [p.lat, p.lon]);
+
+          places.forEach((p) => {
+            const isVisited = read(lsKey("visited", p.id));
+            if (markers[p.id]) {
+              markers[p.id].getElement().classList.toggle("visited", isVisited);
+            }
+          });
+
+          for (let i = 0; i < coords.length - 1; i++) {
+            const startVisited = read(lsKey("visited", places[i].id));
+            if (!startVisited) {
+              const segment = [coords[i], coords[i + 1]];
+              L.polyline(segment, {
+                color: "#d4343a",
+                weight: 4,
+                dashArray: "8, 12",
+                opacity: 0.8,
+                className: "route-line"
+              }).addTo(routeLayerGroup);
+            }
+          }
+        };
+
         /* ---------- LocalStorage helpers ---------- */
         const lsKey = (prefix, id) => `${prefix}-${id}`;
-        const read = (k, def = false) => localStorage.getItem(k) === "true" || def;
+        const read = (k, def = false) =>
+          localStorage.getItem(k) === "true" || def;
         const write = (k, val) => localStorage.setItem(k, !!val);
 
         /* ---------- Place list ---------- */
@@ -220,20 +577,50 @@
           cb.addEventListener("change", () => {
             write(lsKey("visited", p.id), cb.checked);
             details.classList.toggle("checked", cb.checked);
+            updateMapState();
           });
           summary.appendChild(cb);
-          summary.appendChild(document.createTextNode(p.name));
+          summary.appendChild(document.createTextNode(`${p.id}. ${p.name}`));
           details.appendChild(summary);
 
-          const para = document.createElement("p");
-          para.textContent = `${p.desc}\n(${p.address})`;
+          const para = document.createElement("div");
+          para.className = "place-content";
+          para.innerHTML = `${p.desc}<div class="place-address">${p.address}</div>`;
           details.appendChild(para);
 
           list.appendChild(details);
         });
 
+        updateMapState();
+
         /* ---------- Challenges ---------- */
         const chList = document.getElementById("challenge-list");
+        const scoreElement = document.getElementById("score");
+        const totalChallengesElement =
+          document.getElementById("total-challenges");
+        const progressFill = document.getElementById("progress-fill");
+
+        // Set total challenges count
+        totalChallengesElement.textContent = challenges.length;
+
+        // Function to update score and progress bar
+        const updateScore = () => {
+          let score = 0;
+          challenges.forEach((c) => {
+            if (read(lsKey("challenge", c.id))) {
+              score++;
+            }
+          });
+          scoreElement.textContent = score;
+          
+          // Update progress bar
+          const percentage = (score / challenges.length) * 100;
+          progressFill.style.width = `${percentage}%`;
+        };
+
+        // Initial score calculation
+        updateScore();
+
         challenges.forEach((c) => {
           const div = document.createElement("div");
           div.className = "challenge";
@@ -241,6 +628,7 @@
           cb.type = "checkbox";
           cb.checked = read(lsKey("challenge", c.id));
           const label = document.createElement("span");
+          label.className = "challenge-text";
           label.textContent = c.text;
 
           if (cb.checked) div.classList.add("checked");
@@ -248,6 +636,7 @@
           cb.addEventListener("change", () => {
             write(lsKey("challenge", c.id), cb.checked);
             div.classList.toggle("checked", cb.checked);
+            updateScore(); // Update score when challenge is checked/unchecked
           });
 
           div.appendChild(cb);
