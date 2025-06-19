@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="da">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bodega Crawl København</title>
+
+    <!-- Leaflet CSS (integrity fjernet for at undgå blokering i sandbox) -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+      :root {
+        --accent: #b22222;
+      }
+      html,
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #faf7f2;
+        color: #222;
+      }
+      h2 {
+        margin: 0.5em 0;
+        color: var(--accent);
+      }
+      #map {
+        width: 100%;
+        height: 50vh;
+      }
+      section {
+        padding: 1rem;
+        max-width: 800px;
+        margin: auto;
+      }
+      details {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.5rem 0.75rem;
+        background: #fff;
+        transition: background 0.2s;
+      }
+      details + details {
+        margin-top: 0.5rem;
+      }
+      details[open] {
+        background: #f5f5f5;
+      }
+      summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      summary::before {
+        content: "➤";
+        transition: transform 0.2s;
+      }
+      details[open] summary::before {
+        transform: rotate(90deg);
+      }
+      details.checked summary {
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+      input[type="checkbox"] {
+        width: 1.1em;
+        height: 1.1em;
+        accent-color: var(--accent);
+      }
+      /* Challenges */
+      .challenge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0;
+      }
+      .challenge.checked {
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <section>
+      <h2>Bodegaer</h2>
+      <div id="place-list"></div>
+    </section>
+
+    <section>
+      <h2>Challenges</h2>
+      <div id="challenge-list"></div>
+    </section>
+
+    <!-- Leaflet JS (integrity & crossorigin fjernet for at sikre indlæsning) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- App logic -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        /* ---------- Data ---------- */
+        const places = [
+          {
+            id: 1,
+            name: "Galathea Kroen",
+            address: "Rådhusstræde 9, 1466 København K",
+            desc: "Jazzkro med eksotiske souvenirs fra Galathea‑ekspeditionen.",
+            lat: 55.6766,
+            lon: 12.574561,
+          },
+          {
+            id: 2,
+            name: "Toga Vinstue",
+            address: "Store Kirkestræde 3, 1073 København K",
+            desc: "Politisk mødested med klassisk stemning og stort udvalg af specialøl.",
+            lat: 55.678769,
+            lon: 12.580237,
+          },
+          {
+            id: 3,
+            name: "Bo‑Bi Bar",
+            address: "Klareboderne 14, 1115 København K",
+            desc: "Lille ikonisk bar fra 1917 med rødt interiør og flaskebajere.",
+            lat: 55.680742,
+            lon: 12.578066,
+          },
+          {
+            id: 4,
+            name: "Rosengårdens Bodega",
+            address: "Rosengården 11, 1174 København K",
+            desc: "Kælderbodega med dramatisk modstandshistorie og skudhuller i væggen.",
+            lat: 55.6819,
+            lon: 12.5735,
+          },
+          {
+            id: 5,
+            name: "Palæ Bar",
+            address: "Ny Adelgade 5, 1104 København K",
+            desc: "Jazzfyldt bar med kulturpris og nostalgiske skilte.",
+            lat: 55.681,
+            lon: 12.58,
+          },
+          {
+            id: 6,
+            name: "Hviids Vinstue",
+            address: "Kongens Nytorv 19, 1050 København K",
+            desc: "Byens ældste værtshus (1723) – berømt for sin krydrede gløgg.",
+            lat: 55.67978,
+            lon: 12.58472,
+          },
+          {
+            id: 7,
+            name: "Skindbuksen",
+            address: "Lille Kongensgade 4, 1074 København K",
+            desc: "Historisk værtshus siden 1728 med klassisk dansk menu.",
+            lat: 55.6793,
+            lon: 12.5828,
+          },
+        ];
+
+        const challenges = [
+          { id: "ch1", text: "Bund en øl" },
+          { id: "ch2", text: "Vær en god wingman for Oskar" },
+          { id: "ch3", text: "Snak med en du ikke kender" },
+          { id: "ch4", text: "Stjæl noget (småt & sjovt)" },
+        ];
+
+        /* ---------- Guard: Leaflet indlæst? ---------- */
+        if (typeof L === "undefined") {
+          const warn = document.createElement("p");
+          warn.style.color = "var(--accent)";
+          warn.style.padding = "1rem";
+          warn.textContent =
+            "⚠️ Kortet kunne ikke indlæses (Leaflet mangler). Tjek din internetforbindelse eller script‑url.";
+          document.getElementById("map").replaceWith(warn);
+          return;
+        }
+
+        /* ---------- Kort ---------- */
+        const mapCenter = [55.6795, 12.579];
+        const map = L.map("map").setView(mapCenter, 15);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap",
+          maxZoom: 19,
+        }).addTo(map);
+
+        places.forEach((p) => {
+          if (p.lat && p.lon) {
+            const marker = L.marker([p.lat, p.lon]).addTo(map);
+            marker.bindPopup(`<strong>${p.name}</strong><br>${p.address}`);
+          }
+        });
+
+        /* ---------- LocalStorage helpers ---------- */
+        const lsKey = (prefix, id) => `${prefix}-${id}`;
+        const read = (k, def = false) => localStorage.getItem(k) === "true" || def;
+        const write = (k, val) => localStorage.setItem(k, !!val);
+
+        /* ---------- Place list ---------- */
+        const list = document.getElementById("place-list");
+        places.forEach((p) => {
+          const details = document.createElement("details");
+          details.dataset.id = p.id;
+          const visited = read(lsKey("visited", p.id));
+          if (visited) details.classList.add("checked");
+
+          const summary = document.createElement("summary");
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = visited;
+          cb.addEventListener("change", () => {
+            write(lsKey("visited", p.id), cb.checked);
+            details.classList.toggle("checked", cb.checked);
+          });
+          summary.appendChild(cb);
+          summary.appendChild(document.createTextNode(p.name));
+          details.appendChild(summary);
+
+          const para = document.createElement("p");
+          para.textContent = `${p.desc}\n(${p.address})`;
+          details.appendChild(para);
+
+          list.appendChild(details);
+        });
+
+        /* ---------- Challenges ---------- */
+        const chList = document.getElementById("challenge-list");
+        challenges.forEach((c) => {
+          const div = document.createElement("div");
+          div.className = "challenge";
+          const cb = document.createElement("input");
+          cb.type = "checkbox";
+          cb.checked = read(lsKey("challenge", c.id));
+          const label = document.createElement("span");
+          label.textContent = c.text;
+
+          if (cb.checked) div.classList.add("checked");
+
+          cb.addEventListener("change", () => {
+            write(lsKey("challenge", c.id), cb.checked);
+            div.classList.toggle("checked", cb.checked);
+          });
+
+          div.appendChild(cb);
+          div.appendChild(label);
+          chList.appendChild(div);
+        });
+      });
+    </script>
+  </body>
+</html>
